@@ -17,16 +17,20 @@ import { CartDrawerItem } from './cart-drawer-item';
 import { getCartItemDetails } from '@/lib/get-cart-item-details';
 import { useCartStore } from '@/store/cart';
 import { PizzaSize, PizzaType } from '@/constants/pizza';
+import { updateItemQuantity } from '@/services/cart';
 
 interface Props {
     className?: string;
 }
 
 export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({ children,className }) => {
-    const [totalAmount, fetchCartItems, items] = useCartStore(state => [
+    const [totalAmount, fetchCartItems, updateItemQuantity,items,removeCartItem] = useCartStore(state => [
         state.totalAmount, 
         state.fetchCartItems,
+        state.updateItemQuantity,
         state.items,
+        state.removeCartItem
+       
     ])
     const [redirecting, setRedirecting] = React.useState(false)
 
@@ -35,12 +39,12 @@ export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({ children,
     }, [])
 
     const onClickCountButton = (id: number, quantity: number, type: 'plus'| 'minus') => {
-        console.log(id, quantity, type);
-        
+        const newQuantity = type === 'plus' ? quantity + 1 : quantity - 1;
+        updateItemQuantity(id, newQuantity)
     }
     
   return (
-    <Sheet>
+    <Sheet>  
         <SheetTrigger asChild>{children}</SheetTrigger>
         <SheetContent className='flex flex-col justify-between pb-0 bg-[#F4F1EE]'>
         <SheetHeader>
@@ -60,7 +64,10 @@ export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({ children,
                         name={item.name} 
                         price={item.price} 
                         quantity={item.quantity}
-                        onClickCountButton={(type) => onClickCountButton(item.id, item.quantity, type)}
+                        onClickCountButton={(type) =>
+                            onClickCountButton(item.id, item.quantity, type)
+                          }
+                          onClickRemove={() => removeCartItem(item.id)}
                          />
                 ))
               }
