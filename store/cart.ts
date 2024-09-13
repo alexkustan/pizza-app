@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Api } from '../services/api-client';
-import { getCartDetails } from '../lib';
+import { getCartDetails } from '../lib/get-cart-details';
 import { CartStateItem } from '../lib/get-cart-details';
 import { CreateCartItemValues } from '../services/dto/cart.dto';
 
@@ -10,9 +10,9 @@ export interface CartState {
   totalAmount: number;
   items: CartStateItem[];
 
-  fetchCartItems: () => Promise<void>;
+  fetchCartItems: () => Promise<void>; 
   updateItemQuantity: (id: number, quantity: number) => Promise<void>;
-  addCartItem: (values: any) => Promise<void>;
+  addCartItem: (values: CreateCartItemValues) => Promise<void>;
   removeCartItem: (id: number) => Promise<void>;
 }
 
