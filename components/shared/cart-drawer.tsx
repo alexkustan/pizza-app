@@ -53,11 +53,12 @@ export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({ children,
             </SheetTitle>
         </SheetHeader>
         <div className='-mx-6 mt-5 overflow-auto flex-1 scrollbar'>
-            <div className='mb-2'>
+         
               {
                 items.map((item) => (
+                       <div className='mb-2' key={item.id}>
                     <CartDrawerItem 
-                        key={item.id}
+                       
                         id={item.id} 
                         imageUrl={item.imageUrl}
                         details={item.pizzaSize && item.pizzaType? getCartItemDetails(item.ingredients,item.pizzaType as PizzaType, item.pizzaSize as PizzaSize) : ''} 
@@ -68,10 +69,11 @@ export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({ children,
                             onClickCountButton(item.id, item.quantity, type)
                           }
                           onClickRemove={() => removeCartItem(item.id)}
-                         />
+                         />  
+                         </div> 
                 ))
               }
-            </div> 
+          
        </div>
         <SheetFooter className='-mx-6 bg-white p-8 flex-col'>
             <div className='w-full'>

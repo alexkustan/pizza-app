@@ -6,19 +6,21 @@ import { cn } from '@/lib/utils';
 interface Props {
   imageUrl: string;
   name: string;
+  price: number;
   loading?: boolean;
   onSubmit?: VoidFunction;
   className?: string;
 }
 
+
 export const ChooseProductForm: React.FC<Props> = ({
   name,
   imageUrl,
+  price,
   onSubmit,
   className,
   loading,
 }) => {
-  const totalPrice = 5
   return (
     <div className={cn(className, 'flex flex-1')}>
       <div className="flex items-center justify-center flex-1 relative w-full">
@@ -36,7 +38,7 @@ export const ChooseProductForm: React.FC<Props> = ({
           loading={loading}
           onClick={() => onSubmit?.()}
           className="h-[55px] px-10 text-base rounded-[18px] w-full mt-10">
-          add to cart for {totalPrice} $ 
+          Add to cart for {price} $
         </Button>
       </div>
     </div>

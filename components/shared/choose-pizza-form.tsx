@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { Ingredient, ProductItem } from '@prisma/client';
-import { ProductImage } from './product-image';
-import { Title } from './title';
-import { GroupVariants } from './group-variants';
-import { PizzaSize, PizzaType, pizzaTypes } from '@/constants/pizza';
-import { Button } from '../ui';
-import { IngredientCart } from './ingredient-cart';
-import { usePizzaOptions } from '@/hooks/use-pizza-options';
-import { cn } from '@/lib/utils';
-import { getPizzaDetails } from '@/lib/get-pizza-details';
 
+
+import { Title } from './title';
+import { Button } from '../ui';
+import { GroupVariants } from './group-variants';
+import { usePizzaOptions } from '@/hooks/use-pizza-options';
+import { getPizzaDetails } from '@/lib/get-pizza-details';
+import { ProductImage } from './product-image';
+import { PizzaSize, PizzaType, pizzaTypes } from '@/constants/pizza';
+import { IngredientCart } from './ingredient-cart';
+import { cn } from '@/lib/utils';
 
 interface Props {
   imageUrl: string;
