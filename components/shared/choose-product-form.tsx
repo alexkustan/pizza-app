@@ -1,7 +1,7 @@
-import React from 'react';
-import { Title } from './title';
-import { Button } from '../ui';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Title } from "./title";
+import { Button } from "../ui";
+import { cn } from "@/lib/utils";
 
 interface Props {
   imageUrl: string;
@@ -12,7 +12,6 @@ interface Props {
   className?: string;
 }
 
-
 export const ChooseProductForm: React.FC<Props> = ({
   name,
   imageUrl,
@@ -22,7 +21,7 @@ export const ChooseProductForm: React.FC<Props> = ({
   loading,
 }) => {
   return (
-    <div className={cn(className, 'flex flex-1')}>
+    <div className={cn(className, "flex flex-1")}>
       <div className="flex items-center justify-center flex-1 relative w-full">
         <img
           src={imageUrl}
@@ -37,7 +36,8 @@ export const ChooseProductForm: React.FC<Props> = ({
         <Button
           loading={loading}
           onClick={() => onSubmit?.()}
-          className="h-[55px] px-10 text-base rounded-[18px] w-full mt-10">
+          className="h-[55px] px-10 text-base rounded-[18px] w-full mt-10"
+        >
           Add to cart for {price} $
         </Button>
       </div>

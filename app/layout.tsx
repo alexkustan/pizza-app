@@ -1,6 +1,7 @@
 import { Nunito } from 'next/font/google';
 
 import './globals.css';
+import { Providers } from '@/components/shared/provider';
 
 const nunito = Nunito({
   subsets: ['latin'],
@@ -19,7 +20,7 @@ export default function RootLayout({
         <link data-rh="true" rel="icon" href="/logo.png" />
       </head>
       <body className={nunito.className}>
-          {children}
+      <Providers>{children}</Providers>
       </body>
     </html>
   );

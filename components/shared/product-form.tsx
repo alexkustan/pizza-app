@@ -1,19 +1,25 @@
-'use client';
+"use client";
 
-import { IProduct } from '@/@types/prisma';
-import React from 'react';
-import { ChoosePizzaForm } from './choose-pizza-form';
-import { ChooseProductForm } from './choose-product-form';
-import { useCartStore } from '@/store/cart';
-import toast from 'react-hot-toast';
+import React from "react";
+import toast from "react-hot-toast";
+import { ChoosePizzaForm } from "./choose-pizza-form";
+import { ChooseProductForm } from "./choose-product-form";
+import { IProduct } from "@/@types/prisma";
+import { useCartStore } from "@/store/cart";
 
 interface Props {
   product: IProduct;
   onSubmit?: VoidFunction;
 }
 
-export const ProductForm: React.FC<Props> = ({ product, onSubmit: _onSubmit }) => {
-  const [addCartItem, loading] = useCartStore((state) => [state.addCartItem, state.loading]);
+export const ProductForm: React.FC<Props> = ({
+  product,
+  onSubmit: _onSubmit,
+}) => {
+  const [addCartItem, loading] = useCartStore((state) => [
+    state.addCartItem,
+    state.loading,
+  ]);
 
   const firstItem = product.items[0];
   const isPizzaForm = Boolean(firstItem.pizzaType);
@@ -27,11 +33,11 @@ export const ProductForm: React.FC<Props> = ({ product, onSubmit: _onSubmit }) =
         ingredients,
       });
 
-      toast.success(product.name + ' добавлена в корзину');
+      toast.success(product.name + " added to cart");
 
       _onSubmit?.();
     } catch (err) {
-      toast.error('Не удалось добавить товар в корзину');
+      toast.error("Failed to add item to cart");
       console.error(err);
     }
   };
@@ -48,7 +54,6 @@ export const ProductForm: React.FC<Props> = ({ product, onSubmit: _onSubmit }) =
       />
     );
   }
-
   return (
     <ChooseProductForm
       imageUrl={product.imageUrl}
