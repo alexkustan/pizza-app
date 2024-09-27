@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 
 import {
   Sheet,
@@ -15,39 +15,19 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CartDrawerItem } from "./cart-drawer-item";
 import { getCartItemDetails } from "@/lib/get-cart-item-details";
-import { useCartStore } from "@/store/cart";
 import { PizzaSize, PizzaType } from "@/constants/pizza";
-import { updateItemQuantity } from "@/services/cart";
 import Image from "next/image";
 import { Title } from "./title";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/use-cart";
 
 interface Props {
   className?: string;
 }
 
-export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({
-  children,
-  className,
-}) => {
-  const [
-    totalAmount,
-    fetchCartItems,
-    updateItemQuantity,
-    items,
-    removeCartItem,
-  ] = useCartStore((state) => [
-    state.totalAmount,
-    state.fetchCartItems,
-    state.updateItemQuantity,
-    state.items,
-    state.removeCartItem,
-  ]);
+export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const { totalAmount, updateItemQuantity, items, removeCartItem } = useCart();
   const [redirecting, setRedirecting] = React.useState(false);
-
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
 
   const onClickCountButton = (
     id: number,
@@ -103,15 +83,11 @@ export const CartDrawer: React.FC<React.PropsWithChildren<Props>> = ({
                     <CartDrawerItem
                       id={item.id}
                       imageUrl={item.imageUrl}
-                      details={
-                        item.pizzaSize && item.pizzaType
-                          ? getCartItemDetails(
-                              item.ingredients,
-                              item.pizzaType as PizzaType,
-                              item.pizzaSize as PizzaSize
-                            )
-                          : ""
-                      }
+                      details={getCartItemDetails(
+                        item.ingredients,
+                        item.pizzaType as PizzaType,
+                        item.pizzaSize as PizzaSize
+                      )}
                       name={item.name}
                       price={item.price}
                       quantity={item.quantity}
