@@ -1,17 +1,80 @@
 "use client";
 
-import { CheckoutItem } from "@/components/shared/checkout-item";
-import { CheckoutSidebar } from "@/components/shared/checkout-sidebar";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import toast from "react-hot-toast";
+import React from "react";
+import { useSession } from "next-auth/react";
+import { Api } from "@/services/api-client";
+import { useCart } from "@/hooks/use-cart";
+import {
+  checkoutFormSchema,
+  CheckoutFormValues,
+} from "@/constants/checkout-form-schema";
 import { Container } from "@/components/shared/container";
 import { Title } from "@/components/shared/title";
-import { WhiteBlock } from "@/components/shared/white-block";
-import { Input, Textarea } from "@/components/ui";
-import { PizzaSize, PizzaType } from "@/constants/pizza";
-import { useCart } from "@/hooks/use-cart";
-import { getCartItemDetails } from "@/lib/get-cart-item-details";
+import { CheckoutCart } from "@/components/shared/checkout/checkout-cart";
+import { CheckoutPersonalForm } from "@/components/shared/checkout/checkout-personal-form";
+import { CheckoutAddressForm } from "@/components/shared/checkout/checkout-address-form";
+import { CheckoutSidebar } from "@/components/shared/checkout-sidebar";
+import { loadStripe } from "@stripe/stripe-js";
 
-export default function checkoutPage() {
-  const { totalAmount, updateItemQuantity, items, removeCartItem } = useCart();
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
+
+export default function CheckoutPage() {
+  const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
+    useCart();
+  const [submitting, setSubmitting] = React.useState(false);
+  const { data: session } = useSession();
+
+  const form = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      address: "",
+      comment: "",
+    },
+  });
+
+  React.useEffect(() => {
+    async function fetchUserInfo() {
+      const data = await Api.auth.getMe();
+      const [firstName, lastName] = data.fullName.split(" ");
+
+      form.setValue("firstName", firstName);
+      form.setValue("lastName", lastName);
+      form.setValue("email", data.email);
+    }
+
+    if (session) {
+      fetchUserInfo();
+    }
+  }, [session]);
+
+  const onSubmit = async (data: CheckoutFormValues) => {
+    try {
+      setSubmitting(true);
+
+      const url = new URLSearchParams(window.location.search);
+
+      toast.error("Order successfully placed! 📝 Proceeding to payment...", {
+        icon: "✅",
+      });
+      console.log(url);
+    } catch (err) {
+      console.log(err);
+      setSubmitting(false);
+      toast.error("Failed to create order", {
+        icon: "❌",
+      });
+    }
+  };
 
   const onClickCountButton = (
     id: number,
@@ -25,76 +88,38 @@ export default function checkoutPage() {
   return (
     <Container className="mt-10">
       <Title
-        text="Placing an order"
+        text="Оформление заказа"
         className="font-extrabold mb-8 text-[36px]"
       />
-      <div className="flex gap-10">
-        <div className="flex flex-col gap-10 flex-1 mb-20">
-          <WhiteBlock title="1. Cart">
-            <div className="flex flex-col gap-5">
-              {items.map((item) => (
-                <CheckoutItem
-                  key={item.id}
-                  id={item.id}
-                  imageUrl={item.imageUrl}
-                  details={getCartItemDetails(
-                    item.ingredients,
-                    item.pizzaType as PizzaType,
-                    item.pizzaSize as PizzaSize
-                  )}
-                  name={item.name}
-                  price={item.price}
-                  quantity={item.quantity}
-                  onClickCountButton={(type) =>
-                    onClickCountButton(item.id, item.quantity, type)
-                  }
-                  onClickRemove={() => removeCartItem(item.id)}
-                />
-              ))}
-            </div>
-          </WhiteBlock>
 
-          <WhiteBlock title="2. Personal Information">
-            <div className="grid grid-cols-2 gap-5">
-              <Input
-                name="firstName"
-                className="text-base"
-                placeholder="First name"
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex gap-10">
+            {/* left side */}
+            <div className="flex flex-col gap-10 flex-1 mb-20">
+              <CheckoutCart
+                onClickCountButton={onClickCountButton}
+                removeCartItem={removeCartItem}
+                items={items}
+                loading={loading}
               />
-              <Input
-                name="lastName"
-                className="text-base"
-                placeholder="Last name"
+
+              <CheckoutPersonalForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
               />
-              <Input name="email" className="text-base" placeholder="E-mail" />
-              <Input
-                name="phone"
-                className="text-base"
-                placeholder="Phone number"
+
+              <CheckoutAddressForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
               />
             </div>
-          </WhiteBlock>
 
-          <WhiteBlock title="3. Delivery address">
-            <div className="flex flex-col gap-5">
-              <Input
-                name="deliveryplace"
-                className="text-base"
-                placeholder="Delivery place"
-              />
-              <Textarea
-                rows={5}
-                className="text-base"
-                placeholder="Please provide additional information for the courier here."
-              />
+            {/* right side */}
+            <div className="w-[450px]">
+              <CheckoutSidebar totalAmount={totalAmount} />
             </div>
-          </WhiteBlock>
-        </div>
-
-        <div className="w-[450px]">
-          <CheckoutSidebar totalAmount={totalAmount} />
-        </div>
-      </div>
+          </div>
+        </form>
+      </FormProvider>
     </Container>
   );
 }
