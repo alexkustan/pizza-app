@@ -38,7 +38,7 @@ export const CheckoutItem: React.FC<Props> = ({
         <CartItemDetails.Info name={name} details={details} />
       </div>
 
-      <CartItemDetails.Price value={price} />
+      <CartItemDetails.Price value={price / 100} />
 
       <div className="flex items-center gap-5 ml-20">
         <CartItemDetails.CountButton

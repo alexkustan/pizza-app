@@ -9,16 +9,20 @@ interface Props {
   totalAmount: number;
 }
 const TAX = 15;
-const DELIVERY_PRICE = 3.99;
+const DELIVERY_PRICE = 399;
 
 export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
   const taxPrice = (totalAmount * TAX) / 100;
-  const totalPrice = totalAmount + DELIVERY_PRICE + taxPrice;
+  const totalPrice = (totalAmount + DELIVERY_PRICE + taxPrice) / 100;
+  const taxPriceInNormal = taxPrice / 100;
+
   return (
     <WhiteBlock className="p-6 sticky top-4">
       <div className="flex flex-col gap-1">
         <span className="text-xl">Total</span>
-        <span className="text-[34px] font-extrabold">{totalPrice} $</span>
+        <span className="text-[34px] font-extrabold">
+          {totalPrice.toFixed(2)} $
+        </span>
       </div>
       <CheckoutItemDetails
         title={
@@ -27,7 +31,7 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
             cost of items:
           </div>
         }
-        value={`${totalAmount} $`}
+        value={`${totalAmount / 100} $`}
       />
       <CheckoutItemDetails
         title={
@@ -36,7 +40,7 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
             tax:
           </div>
         }
-        value={`${taxPrice} $`}
+        value={`${taxPriceInNormal.toFixed(2)} $`}
       />
       <CheckoutItemDetails
         title={
@@ -45,7 +49,7 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
             delivery fee:
           </div>
         }
-        value={`${DELIVERY_PRICE} $`}
+        value={`${DELIVERY_PRICE / 100} $`}
       />
       <Button
         type="submit"
