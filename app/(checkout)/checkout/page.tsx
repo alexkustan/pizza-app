@@ -3,31 +3,27 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import {
+  CheckoutFormValues,
+  checkoutFormSchema,
+} from "@/constants/checkout-form-schema";
+import { createOrder } from "@/app/actions";
 import toast from "react-hot-toast";
 import React from "react";
 import { useSession } from "next-auth/react";
 import { Api } from "@/services/api-client";
 import { useCart } from "@/hooks/use-cart";
-import {
-  checkoutFormSchema,
-  CheckoutFormValues,
-} from "@/constants/checkout-form-schema";
 import { Container } from "@/components/shared/container";
 import { Title } from "@/components/shared/title";
 import { CheckoutCart } from "@/components/shared/checkout/checkout-cart";
 import { CheckoutPersonalForm } from "@/components/shared/checkout/checkout-personal-form";
 import { CheckoutAddressForm } from "@/components/shared/checkout/checkout-address-form";
 import { CheckoutSidebar } from "@/components/shared/checkout-sidebar";
-import { loadStripe } from "@stripe/stripe-js";
-
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
 
 export default function CheckoutPage() {
+  const [submitting, setSubmitting] = React.useState(false);
   const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
     useCart();
-  const [submitting, setSubmitting] = React.useState(false);
   const { data: session } = useSession();
 
   const form = useForm<CheckoutFormValues>({
@@ -61,18 +57,17 @@ export default function CheckoutPage() {
     try {
       setSubmitting(true);
 
-      const url = new URLSearchParams(window.location.search);
+      const url = await createOrder(data); // This will redirect to Stripe Checkout
 
-      toast.error("Order successfully placed! 📝 Proceeding to payment...", {
-        icon: "✅",
-      });
-      console.log(url);
+      toast.success("Order successfully created! Redirecting to payment...");
+
+      if (url) {
+        location.href = url; // Redirect to Stripe Checkout page
+      }
     } catch (err) {
       console.log(err);
       setSubmitting(false);
-      toast.error("Failed to create order", {
-        icon: "❌",
-      });
+      toast.error("Failed to create order");
     }
   };
 
@@ -87,15 +82,11 @@ export default function CheckoutPage() {
 
   return (
     <Container className="mt-10">
-      <Title
-        text="Оформление заказа"
-        className="font-extrabold mb-8 text-[36px]"
-      />
+      <Title text="Checkout" className="font-extrabold mb-8 text-[36px]" />
 
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex gap-10">
-            {/* left side */}
             <div className="flex flex-col gap-10 flex-1 mb-20">
               <CheckoutCart
                 onClickCountButton={onClickCountButton}
@@ -113,7 +104,6 @@ export default function CheckoutPage() {
               />
             </div>
 
-            {/* right side */}
             <div className="w-[450px]">
               <CheckoutSidebar totalAmount={totalAmount} />
             </div>

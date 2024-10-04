@@ -1,24 +1,22 @@
-import { Prisma } from '@prisma/client';
-import { categories, ingredients, products } from './constants';
-import { prisma } from './prisma-client';
-import { hashSync } from 'bcrypt';
-
-const randomDecimalNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min) * 10 + min * 10) / 10;
-};
+import { Prisma } from "@prisma/client";
+import { categories, ingredients, products } from "./constants";
+import { prisma } from "./prisma-client";
+import { hashSync } from "bcrypt";
 
 const generateProductItem = ({
   productId,
   pizzaType,
   size,
+  price,
 }: {
   productId: number;
   pizzaType?: 1 | 2;
   size?: 25 | 30 | 35;
+  price?: number;
 }) => {
   return {
     productId,
-    price: randomDecimalNumber(190, 600),
+    price,
     pizzaType,
     size,
   } as Prisma.ProductItemUncheckedCreateInput;
@@ -28,18 +26,18 @@ async function up() {
   await prisma.user.createMany({
     data: [
       {
-        fullName: 'User Test',
-        email: 'user@test.ru',
-        password: hashSync('111111', 10),
+        fullName: "User Test",
+        email: "user@test.ru",
+        password: hashSync("111111", 10),
         verified: new Date(),
-        role: 'USER',
+        role: "USER",
       },
       {
-        fullName: 'Admin Admin',
-        email: 'admin@test.ru',
-        password: hashSync('111111', 10),
+        fullName: "Admin Admin",
+        email: "admin@test.ru",
+        password: hashSync("111111", 10),
         verified: new Date(),
-        role: 'ADMIN',
+        role: "ADMIN",
       },
     ],
   });
@@ -58,9 +56,9 @@ async function up() {
 
   const pizza1 = await prisma.product.create({
     data: {
-      name: 'Пепперони фреш',
+      name: "Pepperoni fresh ",
       imageUrl:
-        'https://media.dodostatic.net/image/r:233x233/11EE7D61304FAF5A98A6958F2BB2D260.webp',
+        "https://media.dodostatic.net/image/r:233x233/11EE7D61304FAF5A98A6958F2BB2D260.webp",
       categoryId: 2,
       ingredients: {
         connect: ingredients.slice(0, 5).map((ing) => ({ id: ing.id })),
@@ -70,9 +68,9 @@ async function up() {
 
   const pizza2 = await prisma.product.create({
     data: {
-      name: 'Сырная',
+      name: "Cheese",
       imageUrl:
-        'https://media.dodostatic.net/image/r:233x233/11EE7D610CF7E265B7C72BE5AE757CA7.webp',
+        "https://media.dodostatic.net/image/r:233x233/11EE7D610CF7E265B7C72BE5AE757CA7.webp",
       categoryId: 2,
       ingredients: {
         connect: ingredients.slice(5, 10).map((ing) => ({ id: ing.id })),
@@ -82,9 +80,9 @@ async function up() {
 
   const pizza3 = await prisma.product.create({
     data: {
-      name: 'Чоризо фреш',
+      name: "Chorizo ​​fresh",
       imageUrl:
-        'https://media.dodostatic.net/image/r:584x584/11EE7D61706D472F9A5D71EB94149304.webp',
+        "https://media.dodostatic.net/image/r:584x584/11EE7D61706D472F9A5D71EB94149304.webp",
       categoryId: 2,
       ingredients: {
         connect: ingredients.slice(10, 15).map((ing) => ({ id: ing.id })),
@@ -94,27 +92,89 @@ async function up() {
 
   await prisma.productItem.createMany({
     data: [
-      // Пицца "Пепперони фреш"
-      generateProductItem({ productId: pizza1.id, pizzaType: 1, size: 25 }),
-      generateProductItem({ productId: pizza1.id, pizzaType: 2, size: 30 }),
-      generateProductItem({ productId: pizza1.id, pizzaType: 2, size: 35 }),
-
-      // Пицца "Сырная"
-      generateProductItem({ productId: pizza2.id, pizzaType: 1, size: 25 }),
-      generateProductItem({ productId: pizza2.id, pizzaType: 1, size: 30 }),
-      generateProductItem({ productId: pizza2.id, pizzaType: 1, size: 35 }),
-      generateProductItem({ productId: pizza2.id, pizzaType: 2, size: 30 }),
-      generateProductItem({ productId: pizza2.id, pizzaType: 2, size: 35 }),
-
-      // Пицца "Чоризо фреш"
-      generateProductItem({ productId: pizza3.id, pizzaType: 1, size: 25 }),
-      generateProductItem({ productId: pizza3.id, pizzaType: 2, size: 30 }),
-      generateProductItem({ productId: pizza3.id, pizzaType: 2, size: 35 }),
-
-      // Остальные продукты
-      ...Array.from({ length: 17 }, (_, i) =>
-        generateProductItem({ productId: i + 1 })
-      ),
+      generateProductItem({
+        productId: pizza1.id,
+        pizzaType: 1,
+        size: 25,
+        price: 699,
+      }),
+      generateProductItem({
+        productId: pizza1.id,
+        pizzaType: 2,
+        size: 30,
+        price: 1299,
+      }),
+      generateProductItem({
+        productId: pizza1.id,
+        pizzaType: 2,
+        size: 35,
+        price: 1299,
+      }),
+      generateProductItem({
+        productId: pizza2.id,
+        pizzaType: 1,
+        size: 25,
+        price: 599,
+      }),
+      generateProductItem({
+        productId: pizza2.id,
+        pizzaType: 1,
+        size: 30,
+        price: 1199,
+      }),
+      generateProductItem({
+        productId: pizza2.id,
+        pizzaType: 1,
+        size: 35,
+        price: 1499,
+      }),
+      generateProductItem({
+        productId: pizza2.id,
+        pizzaType: 2,
+        size: 30,
+        price: 1199,
+      }),
+      generateProductItem({
+        productId: pizza2.id,
+        pizzaType: 2,
+        size: 35,
+        price: 1499,
+      }),
+      generateProductItem({
+        productId: pizza3.id,
+        pizzaType: 1,
+        size: 25,
+        price: 599,
+      }),
+      generateProductItem({
+        productId: pizza3.id,
+        pizzaType: 2,
+        size: 30,
+        price: 1199,
+      }),
+      generateProductItem({
+        productId: pizza3.id,
+        pizzaType: 2,
+        size: 35,
+        price: 1499,
+      }),
+      generateProductItem({ productId: 1, price: 399 }),
+      generateProductItem({ productId: 2, price: 399 }),
+      generateProductItem({ productId: 3, price: 349 }),
+      generateProductItem({ productId: 4, price: 559 }),
+      generateProductItem({ productId: 5, price: 299 }),
+      generateProductItem({ productId: 6, price: 399 }),
+      generateProductItem({ productId: 7, price: 549 }),
+      generateProductItem({ productId: 8, price: 549 }),
+      generateProductItem({ productId: 9, price: 449 }),
+      generateProductItem({ productId: 10, price: 449 }),
+      generateProductItem({ productId: 11, price: 449 }),
+      generateProductItem({ productId: 12, price: 349 }),
+      generateProductItem({ productId: 13, price: 349 }),
+      generateProductItem({ productId: 14, price: 349 }),
+      generateProductItem({ productId: 15, price: 349 }),
+      generateProductItem({ productId: 16, price: 349 }),
+      generateProductItem({ productId: 17, price: 349 }),
     ],
   });
 
@@ -123,12 +183,12 @@ async function up() {
       {
         userId: 1,
         totalAmount: 0,
-        token: '11111',
+        token: "11111",
       },
       {
         userId: 2,
         totalAmount: 0,
-        token: '222222',
+        token: "222222",
       },
     ],
   });
@@ -148,27 +208,27 @@ async function up() {
     data: [
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/xep/xzh/zmc/cr4gcw0aselwvf628pbmj3j/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=3101815496',
+          "https://cdn.inappstory.ru/story/xep/xzh/zmc/cr4gcw0aselwvf628pbmj3j/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=3101815496",
       },
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/km2/9gf/jrn/sb7ls1yj9fe5bwvuwgym73e/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=3074015640',
+          "https://cdn.inappstory.ru/story/km2/9gf/jrn/sb7ls1yj9fe5bwvuwgym73e/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=3074015640",
       },
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/quw/acz/zf5/zu37vankpngyccqvgzbohj1/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=1336215020',
+          "https://cdn.inappstory.ru/story/quw/acz/zf5/zu37vankpngyccqvgzbohj1/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=1336215020",
       },
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/7oc/5nf/ipn/oznceu2ywv82tdlnpwriyrq/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=38903958',
+          "https://cdn.inappstory.ru/story/7oc/5nf/ipn/oznceu2ywv82tdlnpwriyrq/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=38903958",
       },
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/q0t/flg/0ph/xt67uw7kgqe9bag7spwkkyw/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=2941222737',
+          "https://cdn.inappstory.ru/story/q0t/flg/0ph/xt67uw7kgqe9bag7spwkkyw/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=2941222737",
       },
       {
         previewImageUrl:
-          'https://cdn.inappstory.ru/story/lza/rsp/2gc/xrar8zdspl4saq4uajmso38/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=4207486284',
+          "https://cdn.inappstory.ru/story/lza/rsp/2gc/xrar8zdspl4saq4uajmso38/custom_cover/logo-350x440.webp?k=IgAAAAAAAAAE&v=4207486284",
       },
     ],
   });
@@ -178,27 +238,27 @@ async function up() {
       {
         storyId: 1,
         sourceUrl:
-          'https://cdn.inappstory.ru/file/dd/yj/sx/oqx9feuljibke3mknab7ilb35t.webp?k=IgAAAAAAAAAE',
+          "https://cdn.inappstory.ru/file/dd/yj/sx/oqx9feuljibke3mknab7ilb35t.webp?k=IgAAAAAAAAAE",
       },
       {
         storyId: 1,
         sourceUrl:
-          'https://cdn.inappstory.ru/file/jv/sb/fh/io7c5zarojdm7eus0trn7czdet.webp?k=IgAAAAAAAAAE',
+          "https://cdn.inappstory.ru/file/jv/sb/fh/io7c5zarojdm7eus0trn7czdet.webp?k=IgAAAAAAAAAE",
       },
       {
         storyId: 1,
         sourceUrl:
-          'https://cdn.inappstory.ru/file/ts/p9/vq/zktyxdxnjqbzufonxd8ffk44cb.webp?k=IgAAAAAAAAAE',
+          "https://cdn.inappstory.ru/file/ts/p9/vq/zktyxdxnjqbzufonxd8ffk44cb.webp?k=IgAAAAAAAAAE",
       },
       {
         storyId: 1,
         sourceUrl:
-          'https://cdn.inappstory.ru/file/ur/uq/le/9ufzwtpdjeekidqq04alfnxvu2.webp?k=IgAAAAAAAAAE',
+          "https://cdn.inappstory.ru/file/ur/uq/le/9ufzwtpdjeekidqq04alfnxvu2.webp?k=IgAAAAAAAAAE",
       },
       {
         storyId: 1,
         sourceUrl:
-          'https://cdn.inappstory.ru/file/sy/vl/c7/uyqzmdojadcbw7o0a35ojxlcul.webp?k=IgAAAAAAAAAE',
+          "https://cdn.inappstory.ru/file/sy/vl/c7/uyqzmdojadcbw7o0a35ojxlcul.webp?k=IgAAAAAAAAAE",
       },
     ],
   });
@@ -219,15 +279,14 @@ async function main() {
     await down();
     await up();
   } catch (e) {
-    console.error('An error occurred:', e);
+    console.error("An error occurred:", e);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-main()
-  .catch(async (e) => {
-    console.error('Error during the main execution:', e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main().catch(async (e) => {
+  console.error("Error during the main execution:", e);
+  await prisma.$disconnect();
+  process.exit(1);
+});

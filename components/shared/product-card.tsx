@@ -4,6 +4,7 @@ import { Title } from "./title";
 import { Button } from "../ui";
 import { Plus } from "lucide-react";
 import { Ingredient } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 interface Props {
   id: number;
@@ -37,7 +38,7 @@ export const ProductCard: React.FC<Props> = ({
 
         <div className="flex justify-between items-center mt-4">
           <span className="text-[20px]">
-            from <b>{price} $</b>
+            from <b>{price / 100} $</b>
           </span>
 
           <Button variant="secondary" className="text-base font-bold">

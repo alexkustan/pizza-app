@@ -1,14 +1,12 @@
 "use server";
 
-import { OrderConfirmationTemplate } from "@/components/shared/email-templates/order-confirmation-template";
-import { CheckoutFormValues } from "@/constants/checkout-form-schema";
-import { sendEmail } from "@/lib/send-email";
 import { prisma } from "@/prisma/prisma-client";
+import { OrderConfirmationTemplate } from "@/components/shared/email-templates/order-confirmation-template";
+import { sendEmail } from "@/lib/send-email";
+import { createPayment } from "@/lib/create-payment";
 import { OrderStatus } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
 import { cookies } from "next/headers";
-
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import { CheckoutFormValues } from "@/constants/checkout-form-schema";
 
 export async function createOrder(data: CheckoutFormValues) {
   try {
@@ -21,10 +19,8 @@ export async function createOrder(data: CheckoutFormValues) {
 
     const userCart = await prisma.cart.findFirst({
       include: {
-        user: true,
         items: {
           include: {
-            ingredients: true,
             productItem: {
               include: {
                 product: true,
@@ -38,18 +34,14 @@ export async function createOrder(data: CheckoutFormValues) {
       },
     });
 
-    if (!userCart) {
-      throw new Error("Cart not found");
-    }
-
-    if (userCart?.totalAmount === 0) {
-      throw new Error("Cart is empty");
+    if (!userCart || userCart.totalAmount === 0) {
+      throw new Error("Cart is empty or not found");
     }
 
     const order = await prisma.order.create({
       data: {
         token: cartToken,
-        fullName: data.firstName + " " + data.lastName,
+        fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
         phone: data.phone,
         address: data.address,
@@ -60,34 +52,45 @@ export async function createOrder(data: CheckoutFormValues) {
       },
     });
 
+    // Clear the cart
     await prisma.cart.update({
-      where: {
-        id: userCart.id,
-      },
-      data: {
-        totalAmount: 0,
-      },
+      where: { id: userCart.id },
+      data: { totalAmount: 0 },
+    });
+    await prisma.cartItem.deleteMany({ where: { cartId: userCart.id } });
+
+    const priceCalc = order.totalAmount;
+
+    // Create a Stripe payment
+    const paymentSession = await createPayment({
+      amount: order.totalAmount,
+      orderId: order.id,
+      description: `Payment for Order #${order.id}`,
     });
 
-    await prisma.cartItem.deleteMany({
-      where: {
-        cartId: userCart.id,
-      },
+    if (!paymentSession) {
+      throw new Error("Payment session not created");
+    }
+
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { paymentId: paymentSession.id },
     });
 
+    // Send confirmation email with the payment URL
     await sendEmail(
       data.email,
-      "Next Pizza / Оплатите заказ #" + order.id,
+      `Payment for Order #${order.id}`,
       OrderConfirmationTemplate({
         orderId: order.id,
         totalAmount: order.totalAmount,
-        paymentUrl:
-          "https://resend.com/api-keys/a8c1ea80-1993-4692-b553-57906c7bc839",
+        paymentUrl: paymentSession.url!,
       })
     );
 
-    return;
+    return paymentSession.url;
   } catch (err) {
     console.log("[CreateOrder] Server error", err);
+    throw new Error("Order creation failed");
   }
 }

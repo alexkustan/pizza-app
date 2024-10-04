@@ -1,0 +1,10 @@
+[lcl-host]
+realm-apid = 'localhost'
+
+[org]
+apid = 'alexkustan'
+
+[service]
+apid = 'pizza-app-main-main'
+category = 'javascript'
+cert-style = 'acme'

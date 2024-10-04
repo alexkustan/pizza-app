@@ -26,6 +26,7 @@
     "@stripe/react-stripe-js": "^2.8.0",
     "@stripe/stripe-js": "^4.5.0",
     "@types/bcrypt": "^5.0.2",
+    "anchor-pki": "^0.3.2",
     "axios": "^1.7.4",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",

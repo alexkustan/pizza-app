@@ -1,35 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-interface Props {}
+import { Stripe } from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+interface Props {
+  description: string;
+  orderId: number;
+  amount: number;
+}
 
-export async function POST(req: NextRequest) {
-  if (req.method === "POST") {
-    try {
-      const body = await req.json();
+export async function createPayment(details: Props) {
+  const domain = process.env.YOUR_DOMAIN;
 
-      const session = await stripe.checkout.sessions.create({
-        line_items: [
-          {
-            price: "price_1Q4m2iEYyEDRQSSTZXgpD9Uw", // Use your price ID
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        success_url: `${req.headers.get("origin")}/?success=true`,
-        cancel_url: `${req.headers.get("origin")}/?canceled=true`,
-      });
-
-      return NextResponse.redirect(session.url as string, 303);
-    } catch (err: any) {
-      return NextResponse.json(
-        { error: err.message },
-        { status: err.statusCode || 500 }
-      );
-    }
-  } else {
-    return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
+  if (!domain) {
+    throw new Error("YOUR_DOMAIN is not defined in the environment variables");
   }
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd", // Use your appropriate currency
+          product_data: {
+            name: `Order #${details.orderId}`,
+          },
+          unit_amount: details.amount * 100, // Amount in cents
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${domain}/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${domain}/cancel`,
+    metadata: {
+      order_id: details.orderId,
+    },
+  });
+
+  return session;
 }
