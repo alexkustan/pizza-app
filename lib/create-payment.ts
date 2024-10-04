@@ -13,6 +13,9 @@ export async function createPayment(details: Props) {
   if (!domain) {
     throw new Error("YOUR_DOMAIN is not defined in the environment variables");
   }
+  const taxRate = 0.15;
+  const delivery = 399;
+  const taxAmount = details.amount * taxRate;
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
@@ -23,7 +26,7 @@ export async function createPayment(details: Props) {
           product_data: {
             name: `Order #${details.orderId}`,
           },
-          unit_amount: details.amount * 100, // Amount in cents
+          unit_amount: Math.round(details.amount + taxAmount + delivery),
         },
         quantity: 1,
       },

@@ -43,7 +43,7 @@ export const CheckoutCart: React.FC<Props> = ({
                   item.pizzaSize as PizzaSize
                 )}
                 name={item.name}
-                price={item.price / 100}
+                price={item.price}
                 quantity={item.quantity}
                 disabled={item.disabled}
                 onClickCountButton={(type) =>
