@@ -89,7 +89,7 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
                         item.pizzaSize as PizzaSize
                       )}
                       name={item.name}
-                      price={item.price}
+                      price={item.price / 100}
                       quantity={item.quantity}
                       onClickCountButton={(type) =>
                         onClickCountButton(item.id, item.quantity, type)
@@ -107,7 +107,9 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
                       <div className="flex-1 border-b border-dashed border-b-neutral-200 relative -top-1 mx-2" />
                     </span>
 
-                    <span className="font-bold text-lg">{totalAmount} $</span>
+                    <span className="font-bold text-lg">
+                      {totalAmount / 100} $
+                    </span>
                   </div>
                 </div>
                 <Link href="/checkout">

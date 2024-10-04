@@ -90,7 +90,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
                 <IngredientCart
                   key={ingredient.id}
                   name={ingredient.name}
-                  price={ingredient.price}
+                  price={ingredient.price / 100}
                   imageUrl={ingredient.imageUrl}
                   onClick={() => addIngredient(ingredient.id)}
                   active={selectedIngredients.has(ingredient.id)}
@@ -105,7 +105,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
           onClick={handleClickAdd}
           className="h-[55px] px-10 text-base rounded-[18px] w-full mt-10"
         >
-          Add to cart for {totalPrice} $
+          Add to cart for {totalPrice / 100} $
         </Button>
       </div>
     </div>

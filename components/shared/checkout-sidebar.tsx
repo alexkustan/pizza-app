@@ -8,12 +8,12 @@ interface Props {
   className?: string;
   totalAmount: number;
 }
-const TAX = 0.15;
-const DELIVERY_PRICE = 399;
+const TAX = 15;
+const DELIVERY_PRICE = 3.99;
 
 export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
   const taxPrice = (totalAmount * TAX) / 100;
-  const totalPrice = (totalAmount + DELIVERY_PRICE + taxPrice) / 100;
+  const totalPrice = totalAmount + DELIVERY_PRICE + taxPrice;
   return (
     <WhiteBlock className="p-6 sticky top-4">
       <div className="flex flex-col gap-1">
@@ -38,7 +38,7 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount }) => {
             tax:
           </div>
         }
-        value={`${taxPrice.toFixed(2)} $`}
+        value={`${taxPrice} $`}
       />
       <CheckoutItemDetails
         title={

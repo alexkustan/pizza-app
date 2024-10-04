@@ -38,7 +38,7 @@ export const ChooseProductForm: React.FC<Props> = ({
           onClick={() => onSubmit?.()}
           className="h-[55px] px-10 text-base rounded-[18px] w-full mt-10"
         >
-          Add to cart for {price} $
+          Add to cart for {price / 100} $
         </Button>
       </div>
     </div>
