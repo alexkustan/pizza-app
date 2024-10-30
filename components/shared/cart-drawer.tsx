@@ -70,7 +70,7 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
                 className="text-center font-bold my-2"
               />
               <p className="text-center text-neutral-500 mb-5">
-                Add a pizza. Or two! And we will deliver your order from 6.99 $
+                Add a pizza. Or two!
               </p>
             </div>
           )}
