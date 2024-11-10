@@ -28,7 +28,8 @@
     ".next/types/**/*.ts",
     "components/shared/check-out-form.jsx",
     "components/shared/check-out-form.jsx",
-    "app/api/stripe/route.js"
+    "app/api/stripe/route.js",
+    "@types/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }
